@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Concentration Game</title>
+    <title>Number Grid Game</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body { margin: 0; background-color: #f0f0f0; }
@@ -46,9 +46,18 @@
             text.addEventListener('click', () => {
                 if (i === numbers.length + 1) {
                     text.style.textDecoration = 'line-through';
+                    text.style.color = '#ff6666'; // Change the color to light red when crossed out
                     numbers.push(i);
                     if (numbers.length === gridSize * gridSize) {
-                        alert(`Congratulations! You completed the game in ${(Date.now() - startTime) / 1000} seconds.`);
+                        const elapsedTime = (Date.now() - startTime) / 1000;
+                        const elapsedMinutes = (elapsedTime / 60).toFixed(2);
+                        alert(`Congratulations! You completed the game in ${elapsedMinutes} minutes.`);
+                        
+                        const bestTime = localStorage.getItem('bestTime');
+                        if (!bestTime || elapsedTime < parseFloat(bestTime)) {
+                            localStorage.setItem('bestTime', elapsedTime.toString());
+                            bestTimeElement.textContent = `Best Time: ${elapsedMinutes} minutes`;
+                        }
                     }
                 }
             });
@@ -66,11 +75,30 @@
         timer.style.color = '#333';
         document.body.appendChild(timer);
 
+        // Create the best time element
+        const bestTimeElement = document.createElement('div');
+        bestTimeElement.style.position = 'absolute';
+        bestTimeElement.style.top = '100px';
+        bestTimeElement.style.left = '50%';
+        bestTimeElement.style.transform = 'translateX(-50%)';
+        bestTimeElement.style.fontSize = '24px';
+        bestTimeElement.style.color = '#333';
+        document.body.appendChild(bestTimeElement);
+
+        // Retrieve the best time from localStorage
+        const bestTime = localStorage.getItem('bestTime');
+        if (bestTime) {
+            const bestMinutes = (parseFloat(bestTime) / 60).toFixed(2);
+            bestTimeElement.textContent = `Best Time: ${bestMinutes} minutes`;
+        }
+
         // Start the game loop
         const startTime = Date.now();
         function animate() {
             requestAnimationFrame(animate);
-            timer.textContent = `Time: ${((Date.now() - startTime) / 1000).toFixed(2)} seconds`;
+            const elapsedTime = (Date.now() - startTime) / 1000;
+            const elapsedMinutes = (elapsedTime / 60).toFixed(2);
+            timer.textContent = `Time: ${elapsedMinutes} minutes`;
             renderer.render(scene, camera);
         }
         animate();
