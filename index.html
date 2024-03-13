@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Concentration Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; background-color: #f0f0f0; }
+        canvas { width: 100%; height: 100%; }
+        .grid-cell { position: absolute; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; }
+    </style>
+</head>
+<body>
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0xf0f0f0);
+        document.body.appendChild(renderer.domElement);
+
+        // Create the number grid
+        const gridSize = 10;
+        const numbers = [];
+        const grid = document.createElement('div');
+        grid.style.position = 'absolute';
+        grid.style.top = '200px';
+        grid.style.left = `${(window.innerWidth - gridSize * 50) / 2}px`;
+        document.body.appendChild(grid);
+
+        for (let i = 0; i < gridSize * gridSize; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.style.top = `${Math.floor(i / gridSize) * 50}px`;
+            cell.style.left = `${(i % gridSize) * 50}px`;
+            grid.appendChild(cell);
+        }
+
+        const cells = Array.from(document.querySelectorAll('.grid-cell'));
+        for (let i = 1; i <= gridSize * gridSize; i++) {
+            const text = document.createElement('div');
+            text.textContent = i.toString();
+            text.style.fontSize = '24px';
+            text.style.color = '#333';
+            text.style.cursor = 'pointer';
+            text.addEventListener('click', () => {
+                if (i === numbers.length + 1) {
+                    text.style.textDecoration = 'line-through';
+                    numbers.push(i);
+                    if (numbers.length === gridSize * gridSize) {
+                        alert(`Congratulations! You completed the game in ${(Date.now() - startTime) / 1000} seconds.`);
+                    }
+                }
+            });
+            const randomCell = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
+            randomCell.appendChild(text);
+        }
+
+        // Create the timer
+        const timer = document.createElement('div');
+        timer.style.position = 'absolute';
+        timer.style.top = '50px';
+        timer.style.left = '50%';
+        timer.style.transform = 'translateX(-50%)';
+        timer.style.fontSize = '24px';
+        timer.style.color = '#333';
+        document.body.appendChild(timer);
+
+        // Start the game loop
+        const startTime = Date.now();
+        function animate() {
+            requestAnimationFrame(animate);
+            timer.textContent = `Time: ${((Date.now() - startTime) / 1000).toFixed(2)} seconds`;
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
